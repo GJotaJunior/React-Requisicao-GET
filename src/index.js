@@ -1,17 +1,54 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import axios from 'axios';
 
-ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
-);
+export default class Index extends React.Component {
+  state = {
+    covid: []
+  }
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+  componentDidMount() {
+    axios.get(`https://covid-19.dataflowkit.com/v1`)
+      .then(res => {
+        const covid = res.data;
+        this.setState({ covid });
+      })
+  }
+
+  render() {
+    return (
+      <React.Fragment>
+        <h1>COVID-19 live statistics per hour</h1>
+        <table>
+          <tr>
+            <th>Country</th>
+            <th>Active Cases</th>
+            <th>Last Update</th>
+            <th>New Cases</th>
+            <th>New Deaths</th>
+            <th>Total Cases</th>
+            <th>Total Deaths</th>
+            <th>Total Recovered</th>
+          </tr>
+          {this.state.covid.map(covid =>
+            <React.Fragment>
+              <tr>
+                <td>{covid['Country_text']}</td>
+                <td>{covid['Active Cases_text']}</td>
+                <td>{covid['Last Update']}</td>
+                <td>{covid['New Cases_text']}</td>
+                <td>{covid['New Deaths_text']}</td>
+                <td>{covid['Total Cases_text']}</td>
+                <td>{covid['Total Deaths_text']}</td>
+                <td>{covid['Total Recovered_text']}</td>
+              </tr>
+            </React.Fragment>
+          )}
+        </table>
+      </React.Fragment>
+    )
+  }
+}
+
+ReactDOM.render(<Index></Index>, document.getElementById('root'));
